@@ -13,25 +13,28 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("https://swapi.dev/api/films/");
+      const response = await fetch("https://react-http-77fa7-default-rtdb.firebaseio.com/movies.json");
       if(!response.ok){
         throw new Error('Something went wrong....Retrying')
         }
       const data = await response.json();
 
-      const transformedMovies = data.results.map((movieData) => {
-        return {
-          id: movieData.episode_id,
-          title: movieData.title,
-          openingText: movieData.opening_crawl,
-          releaseDate: movieData.release_date,
-        };
-      });
-      setMovies(transformedMovies);
+      const loadedMovies = [];
+
+      for (const key in data) {
+          loadedMovies.push({
+            id : key,
+            title : data[key].title,
+            openingText : data[key].openingText,
+            releaseDate : data[key].releaseDate
+          });
+      };
+      setMovies(loadedMovies);
     }
+
     catch(error) {
       setError(error.message)
-      setTimeout(fetchMoviesHandler,5000)
+      // setTimeout(fetchMoviesHandler,5000)
     }
     setIsLoading(false);
   },[]);
@@ -40,8 +43,17 @@ function App() {
     fetchMoviesHandler();
   }, [fetchMoviesHandler]);
 
-  const addMovieHandler = (movie) => {
-    console.log(movie);
+  const addMovieHandler = async (movie) => {
+    const response= await fetch("https://react-http-77fa7-default-rtdb.firebaseio.com/movies.json", {
+      method : "POST",
+      body : JSON.stringify(movie),
+      headers : {
+        'Content-Type' : 'application/json'
+      }
+    });
+    const data = await response.json();
+    console.log(data);
+    fetchMoviesHandler();
   }
 
   const cancelHandler = () => {
@@ -52,7 +64,7 @@ function App() {
   let content =<p>Found no movies</p>
 
   if(movies.length > 0){
-    content = <MovieList movies={movies} />
+    content = <MovieList movies={movies} setMovies={setMovies}/>
   }
   if(error){
     content=<p>{error}</p>
@@ -76,5 +88,6 @@ function App() {
     </React.Fragment>
   );
 }
+
 
 export default App;
