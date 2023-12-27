@@ -1,6 +1,7 @@
 import './App.css';
 import React, { useState , useEffect, useCallback } from "react";
 import MovieList from "./Components/MovieList";
+import AddMoviesForm from './Components/AddMoviesForm';
 
 function App() {  
 
@@ -39,6 +40,9 @@ function App() {
     fetchMoviesHandler();
   }, [fetchMoviesHandler]);
 
+  const addMovieHandler = (movie) => {
+    console.log(movie);
+  }
 
   const cancelHandler = () => {
     setMovies(false)
@@ -59,6 +63,9 @@ function App() {
 
   return (
     <React.Fragment>
+      <section>
+        <AddMoviesForm onAddMovie={addMovieHandler} />
+      </section>
       <section>
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
